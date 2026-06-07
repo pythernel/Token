@@ -96,6 +96,11 @@ KNOWN_PRIVILEGES = [
 ]
 
 
+def _current_process():
+    """Get pseudo-handle for current process (HANDLE)-1."""
+    return ctypes.c_void_p(-1)
+
+
 def _get_proc_handle(pid):
     """Open a process with query access."""
     kernel32 = ctypes.windll.kernel32
@@ -333,10 +338,7 @@ def print_token_table(results):
 def whoami():
     """Show current process token info."""
     kernel32 = ctypes.windll.kernel32
-    handle = kernel32.GetCurrentProcess()
-    if not handle:
-        print("[-] GetCurrentProcess failed")
-        return
+    handle = _current_process()
 
     token = _get_token_handle(handle, TOKEN_QUERY)
     if not token:
@@ -428,7 +430,7 @@ def list_privs():
     advapi32 = ctypes.windll.advapi32
     kernel32 = ctypes.windll.kernel32
 
-    handle = kernel32.GetCurrentProcess()
+    handle = _current_process()
     token = _get_token_handle(handle, TOKEN_QUERY | TOKEN_ADJUST_PRIVILEGES)
     if not token:
         print("[-] OpenProcessToken failed")
@@ -450,7 +452,7 @@ def enable_priv(priv_name, enable=True):
     advapi32 = ctypes.windll.advapi32
     kernel32 = ctypes.windll.kernel32
 
-    handle = kernel32.GetCurrentProcess()
+    handle = _current_process()
     token = _get_token_handle(handle, TOKEN_QUERY | TOKEN_ADJUST_PRIVILEGES)
     if not token:
         print(f"[-] OpenProcessToken failed ({ctypes.GetLastError()})")
@@ -496,7 +498,7 @@ def check_privesc():
     kernel32 = ctypes.windll.kernel32
     advapi32 = ctypes.windll.advapi32
 
-    handle = kernel32.GetCurrentProcess()
+    handle = _current_process()
     token = _get_token_handle(handle, TOKEN_QUERY)
     if not token:
         print("[-] Cannot open token")
