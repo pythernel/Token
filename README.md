@@ -19,7 +19,7 @@ Zero dependencies — uses ctypes directly.
 ```powershell
 git clone https://github.com/pythernel/token
 cd token
-python token.py list
+python tok.py list
 ```
 
 ### Examples
